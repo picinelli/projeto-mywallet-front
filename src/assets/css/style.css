@@ -1,0 +1,20 @@
+* {
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
+::placeholder {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  color: #000000;
+  position: absolute;
+  left: 10px;
+  top: 30%;
+}
+
+/*
+font-family: 'Raleway', sans-serif;
+font-family: 'Saira Stencil One', cursive;
+*/
