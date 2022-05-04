@@ -1,21 +1,59 @@
-import styled from 'styled-components'
+import styled from "styled-components";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import axios from "axios"
 
 export default function Login() {
+  const navigate = useNavigate()
+  const [usuario, setUsuario] = useState({
+    email: "",
+    senha: "",
+  });
+
+  function logar(e) {
+    e.preventDefault();
+
+    const promise = axios.post('http://localhost:5000/logar', usuario)
+    promise.then(() => {
+      navigate("/inicio")
+    })
+    promise.catch((err) => {
+      window.alert("Usuario ou senha não encontrados")
+      console.log(err)
+    })
+  }
+
   return (
     <Container>
       <Titulo>MyWallet</Titulo>
-      <Form>
-        <Input placeholder="E-mail"></Input>
-        <Input placeholder="Senha"></Input>
+      <Form onSubmit={logar}>
+        <Input
+          placeholder="E-mail"
+          value={usuario.email}
+          onChange={(e) => {
+            setUsuario({ ...usuario, email: e.target.value });
+          }}
+          type="email"
+        ></Input>
+        <Input
+          placeholder="Senha"
+          value={usuario.senha}
+          onChange={(e) => {
+            setUsuario({ ...usuario, senha: e.target.value });
+          }}
+          type="password"
+        ></Input>
         <Botao>Entrar</Botao>
       </Form>
-      <Botao className="cadastre">Primeira vez? Cadastre-se!</Botao>
+      <Link to="/cadastro">
+        <Botao className="cadastre">Primeira vez? Cadastre-se!</Botao>
+      </Link>
     </Container>
-  )
+  );
 }
 
 const Container = styled.div`
-  background: #8C11BE;
+  background: #8c11be;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -25,21 +63,21 @@ const Container = styled.div`
   padding-bottom: 50px;
 
   .cadastre {
-    background: #8C11BE;
+    background: #8c11be;
     margin: 0;
     padding-top: 15px;
   }
-`
+`;
 
 const Titulo = styled.div`
-  font-family: 'Saira Stencil One';
+  font-family: "Saira Stencil One";
   margin-bottom: 15px;
   font-style: normal;
   font-weight: 400;
   font-size: 32px;
   line-height: 50px;
-  color: #FFFFFF;
-`
+  color: #ffffff;
+`;
 
 const Form = styled.form`
   display: flex;
@@ -47,36 +85,36 @@ const Form = styled.form`
   align-items: center;
   width: 100%;
   max-width: 350px;
-`
+`;
 
 const Input = styled.input`
   margin-top: 10px;
   padding-left: 10px;
   width: 100%;
-  max-width: 326px;;
+  max-width: 326px;
   height: 58px;
-  background: #FFFFFF;
+  background: #ffffff;
   border: 0;
   border-radius: 5px;
   position: relative;
 
   :focus::placeholder {
-  color: transparent;
+    color: transparent;
   }
-`
+`;
 
 const Botao = styled.button`
   margin-top: 10px;
   width: 100%;
   max-width: 326px;
   border: 0;
-  background: #A328D6;
+  background: #a328d6;
   height: 46px;
-  font-family: 'Raleway';
+  font-family: "Raleway";
   font-style: normal;
   font-weight: 700;
   font-size: 20px;
   line-height: 23px;
-  color: #FFFFFF;
+  color: #ffffff;
   border-radius: 5px;
-`
+`;
