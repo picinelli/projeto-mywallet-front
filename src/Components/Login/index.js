@@ -1,7 +1,10 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios"
+
+import TokenContext from '../../Contexts/TokenContext.js'
+import RegistrosContext from "../../Contexts/RegistrosContext.js";
 
 export default function Login() {
   const navigate = useNavigate()
@@ -9,18 +12,31 @@ export default function Login() {
     email: "",
     senha: "",
   });
+  const { setToken } = useContext(TokenContext)
+  const { setRegistros } = useContext(RegistrosContext)
 
-  function logar(e) {
+  async function logar(e) {
     e.preventDefault();
 
-    const promise = axios.post('http://localhost:5000/logar', usuario)
-    promise.then(() => {
+    try {
+      const tokenPromise = await axios.post('http://localhost:5000/logar', usuario)
+      setToken(tokenPromise.data)
+      const config = {
+        headers: {
+          Authorization: `Bearer ${tokenPromise.data}`,
+        },
+      };
+
+      const registrosPromise = await axios.get('http://localhost:5000/buscar-registros', config)
+      setRegistros(registrosPromise.data)
+
+      const configStorage = JSON.stringify(config)
+      localStorage.setItem("config", configStorage)
       navigate("/inicio")
-    })
-    promise.catch((err) => {
+    } catch(e) {
       window.alert("Usuario ou senha não encontrados")
-      console.log(err)
-    })
+      console.log(e)
+    }
   }
 
   return (

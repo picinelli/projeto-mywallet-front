@@ -23,6 +23,11 @@ export default function Cadastro() {
     promise.catch((err) => {
       if (err.response.status === 409) {
         window.alert("Email já está sendo utilizado")
+      } else if (err.response.status === 400) {
+        const errorsDetails = err.response.data.map((object) => {
+          return object;
+        });
+        window.alert(errorsDetails)
       } else {
         window.alert("Ops! Alguma coisa deu errado!")
         console.log(err)

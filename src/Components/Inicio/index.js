@@ -1,13 +1,36 @@
 import styled from "styled-components";
+import { useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
+import axios from 'axios'
 
 import iconeSair from "../../assets/images/icone-sair.svg";
 import iconeMais from "../../assets/images/icone-mais.svg";
 import iconeMenos from "../../assets/images/icone-menos.svg";
 
+import RegistrosContext from "../../Contexts/RegistrosContext.js";
+
 export default function Inicio() {
-  let eventos = 1;
+  const { registros, setRegistros } = useContext(RegistrosContext);
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const config = JSON.parse(localStorage.getItem('config'))
+    if(!config) return navigate("/")
+
+    async function buscarRegistros() {
+      try {
+        const registrosPromise = await axios.get('http://localhost:5000/buscar-registros', config)
+        setRegistros(registrosPromise.data)
+      } catch(e) {
+        console.log(e)
+      }
+    }
+    buscarRegistros()
+  }, [navigate, setRegistros]);
+
   function CarregarConteudo() {
-    if (!eventos) {
+    if (!registros.length) {
       return (
         <ConteudoVazio>
           <p>Não há registros de entrada ou saída</p>
@@ -17,20 +40,36 @@ export default function Inicio() {
       return (
         <>
           <Conteudo>
-            <WrapperMovimentacao>
-              <Separador>
-                <Data>30/11</Data>
-                <Movimentacao>Almoco em Familia</Movimentacao>
-              </Separador>
-              <Valor>20.40</Valor>
-            </WrapperMovimentacao>
+            {registros.map((registro) => {
+              const { date, evento, valor } = registro;
+              return (
+                <WrapperMovimentacao key={date + valor}>
+                  <Separador>
+                    <Data>{dayjs(date).format("DD/MM")}</Data>
+                    <Movimentacao>{evento}</Movimentacao>
+                  </Separador>
+                  <Valor>{valor}</Valor>
+                </WrapperMovimentacao>
+              );
+            })}
           </Conteudo>
           <Saldo>
             <SaldoTexto>SALDO</SaldoTexto>
-            <SaldoValor>2849,96</SaldoValor>
+            <SaldoValor>
+              <CalcularSaldo />
+            </SaldoValor>
           </Saldo>
         </>
       );
+    }
+  }
+
+  function CalcularSaldo() {
+    const saldo = registros.reduce((saldo, registro) => saldo + registro.valor, 0)
+    if(saldo >= 0) {
+      return 999
+    } else {
+      return 1
     }
   }
 

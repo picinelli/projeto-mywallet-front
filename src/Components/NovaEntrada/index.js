@@ -1,6 +1,32 @@
-import styled from 'styled-components'
+import styled from "styled-components";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useContext, useEffect } from "react";
+
+import RegistrosContext from "../../Contexts/RegistrosContext.js";
 
 export default function NovaEntrada() {
+  const { setRegistros } = useContext(RegistrosContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const config = JSON.parse(localStorage.getItem("config"));
+    if (!config) return navigate("/");
+
+    async function buscarRegistros() {
+      try {
+        const registrosPromise = await axios.get(
+          "http://localhost:5000/buscar-registros",
+          config
+        );
+        setRegistros(registrosPromise.data);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    buscarRegistros();
+  }, [navigate, setRegistros]);
+
   return (
     <Container>
       <Wrapper>
@@ -12,67 +38,67 @@ export default function NovaEntrada() {
         </Form>
       </Wrapper>
     </Container>
-  )
+  );
 }
 
 const Container = styled.div`
-  background: #8C11BE;
+  background: #8c11be;
   height: 100vh;
   width: 100vw;
   display: flex;
   justify-content: center;
-`
+`;
 
 const Wrapper = styled.div`
   padding: 20px;
   max-width: 375px;
   width: 100%;
-`
+`;
 
 const Titulo = styled.h1`
   margin-bottom: 30px;
-  font-family: 'Raleway';
+  font-family: "Raleway";
   font-weight: 700;
   font-size: 26px;
-  color: #FFFFFF;
-`
+  color: #ffffff;
+`;
 
 const Form = styled.form`
   display: flex;
   flex-direction: column;
   width: 100%;
   max-width: 375px;
-`
+`;
 
 const Input = styled.input`
   margin-top: 10px;
   padding-left: 10px;
   width: 100%;
-  max-width: 326px;;
+  max-width: 326px;
   height: 58px;
   font-size: 20px;
-  background: #FFFFFF;
+  background: #ffffff;
   border: 0;
   border-radius: 5px;
   position: relative;
 
   :focus::placeholder {
-  color: transparent;
+    color: transparent;
   }
-`
+`;
 
 const Botao = styled.button`
   margin-top: 10px;
   width: 100%;
   max-width: 326px;
   border: 0;
-  background: #A328D6;
+  background: #a328d6;
   height: 46px;
-  font-family: 'Raleway';
+  font-family: "Raleway";
   font-style: normal;
   font-weight: 700;
   font-size: 20px;
   line-height: 23px;
-  color: #FFFFFF;
+  color: #ffffff;
   border-radius: 5px;
-`
+`;
