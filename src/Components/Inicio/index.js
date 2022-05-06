@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import dayjs from "dayjs";
 import axios from 'axios'
 
@@ -41,14 +41,14 @@ export default function Inicio() {
         <>
           <Conteudo>
             {registros.map((registro) => {
-              const { date, evento, valor } = registro;
+              const { date, evento, value } = registro;
               return (
-                <WrapperMovimentacao key={date + valor}>
+                <WrapperMovimentacao key={date}>
                   <Separador>
                     <Data>{dayjs(date).format("DD/MM")}</Data>
                     <Movimentacao>{evento}</Movimentacao>
                   </Separador>
-                  <Valor>{valor}</Valor>
+                  <Valor>{parseInt(value)}</Valor>
                 </WrapperMovimentacao>
               );
             })}
@@ -65,12 +65,17 @@ export default function Inicio() {
   }
 
   function CalcularSaldo() {
-    const saldo = registros.reduce((saldo, registro) => saldo + registro.valor, 0)
+    const saldo = registros.reduce((saldo, registro) => saldo + registro.value, 0)
     if(saldo >= 0) {
-      return 999
+      return saldo
     } else {
-      return 1
+      return saldo
     }
+  }
+
+  function Logout() {
+    localStorage.removeItem('config')
+    navigate("/")
   }
 
   return (
@@ -78,24 +83,30 @@ export default function Inicio() {
       <Wrapper>
         <Topo>
           <h1>Olá, Fulano</h1>
-          <img src={iconeSair} alt="icone-sair"></img>
+          <Link to={"/"}>
+            <img src={iconeSair} alt="icone-sair" onClick={Logout}></img>
+          </Link>
         </Topo>
         <CarregarConteudo />
         <OpcoesWrapper>
-          <Opcao>
-            <img src={iconeMais} alt="icone-mais"></img>
-            <p>
-              Nova <br />
-              Entrada
-            </p>
-          </Opcao>
-          <Opcao>
-            <img src={iconeMenos} alt="icone-menos"></img>
-            <p>
-              Nova <br />
-              Saída
-            </p>
-          </Opcao>
+          <Link to={"/nova-entrada"}>
+            <Opcao>
+              <img src={iconeMais} alt="icone-mais"></img>
+              <p>
+                Nova <br />
+                Entrada
+              </p>
+            </Opcao>
+          </Link>
+          <Link to={"/nova-saida"}>
+            <Opcao>
+              <img src={iconeMenos} alt="icone-menos"></img>
+              <p>
+                Nova <br />
+                Saída
+              </p>
+            </Opcao>
+          </Link>
         </OpcoesWrapper>
       </Wrapper>
     </Container>

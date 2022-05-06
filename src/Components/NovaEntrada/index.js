@@ -1,12 +1,16 @@
 import styled from "styled-components";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import RegistrosContext from "../../Contexts/RegistrosContext.js";
 
 export default function NovaEntrada() {
   const { setRegistros } = useContext(RegistrosContext);
+  const [novoRegistro, setNovoRegistro] = useState({
+    evento: "",
+    value: 0,
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,19 +25,56 @@ export default function NovaEntrada() {
         );
         setRegistros(registrosPromise.data);
       } catch (e) {
-        console.log(e);
+        console.log(e, "erro no buscarRegistros, na pagina Nova-Entrada");
       }
     }
     buscarRegistros();
   }, [navigate, setRegistros]);
 
+  async function adicionarRegistro(e) {
+    e.preventDefault();
+    const config = JSON.parse(localStorage.getItem("config"));
+
+    try {
+      const teste = await axios.post(
+        "http://localhost:5000/novo-registro",
+        novoRegistro,
+        config
+      );
+      navigate("/inicio")
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   return (
     <Container>
       <Wrapper>
         <Titulo>Nova entrada</Titulo>
-        <Form>
-          <Input placeholder="Valor"></Input>
-          <Input placeholder="Descrição"></Input>
+        <Form
+          onSubmit={(e) => {
+            adicionarRegistro(e);
+          }}
+        >
+          <Input
+            placeholder="Valor"
+            onChange={(e) => {
+              setNovoRegistro({
+                ...novoRegistro,
+                value: parseInt(e.target.value),
+              });
+            }}
+            value={novoRegistro.valor}
+            type="number"
+          ></Input>
+          <Input
+            placeholder="Descrição"
+            onChange={(e) => {
+              setNovoRegistro({ ...novoRegistro, evento: e.target.value });
+            }}
+            value={novoRegistro.evento}
+            type="text"
+          ></Input>
           <Botao>Salvar entrada</Botao>
         </Form>
       </Wrapper>
