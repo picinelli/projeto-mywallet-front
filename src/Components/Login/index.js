@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios"
 
@@ -14,6 +14,22 @@ export default function Login() {
   });
   const { setToken } = useContext(TokenContext)
   const { setRegistros } = useContext(RegistrosContext)
+
+  useEffect(() => {
+    const config = JSON.parse(localStorage.getItem('config'))
+    if(!config) return navigate("/")
+
+    async function buscarRegistros() {
+      try {
+        const registrosPromise = await axios.get('http://localhost:5000/buscar-registros', config)
+        setRegistros(registrosPromise.data)
+        navigate("/inicio")
+      } catch(e) {
+        console.log(e)
+      }
+    }
+    buscarRegistros()
+  }, [navigate, setRegistros]);
 
   async function logar(e) {
     e.preventDefault();
@@ -48,6 +64,7 @@ export default function Login() {
           value={usuario.email}
           onChange={(e) => {
             setUsuario({ ...usuario, email: e.target.value });
+            console.log(usuario)
           }}
           type="email"
         ></Input>

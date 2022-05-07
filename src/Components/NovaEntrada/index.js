@@ -36,13 +36,14 @@ export default function NovaEntrada() {
     const config = JSON.parse(localStorage.getItem("config"));
 
     try {
-      const teste = await axios.post(
-        "http://localhost:5000/novo-registro",
+      await axios.post(
+        "http://localhost:5000/nova-entrada",
         novoRegistro,
         config
       );
-      navigate("/inicio")
+      navigate("/inicio");
     } catch (e) {
+      window.alert("Digite um valor positivo ou preencha a descrição");
       console.log(e);
     }
   }

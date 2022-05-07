@@ -171,6 +171,7 @@ const Conteudo = styled.div`
 `;
 
 const WrapperMovimentacao = styled.div`
+
   padding: 15px 15px 0 0;
   display: flex;
   align-items: center;
