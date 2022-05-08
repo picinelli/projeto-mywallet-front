@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import dayjs from "dayjs";
 import axios from 'axios'
@@ -12,6 +12,7 @@ import RegistrosContext from "../../Contexts/RegistrosContext.js";
 
 export default function Inicio() {
   const { registros, setRegistros } = useContext(RegistrosContext);
+  const  [nomeUsuario, setNomeUsuario]  = useState("")
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -21,68 +22,21 @@ export default function Inicio() {
     async function buscarRegistros() {
       try {
         const registrosPromise = await axios.get('http://localhost:5000/buscar-registros', config)
+        const buscarNome = await axios.get('http://localhost:5000/buscar-nome', config)
         setRegistros(registrosPromise.data)
+        setNomeUsuario(buscarNome.data)
       } catch(e) {
         console.log(e)
       }
     }
     buscarRegistros()
-  }, [navigate, setRegistros]);
-
-  function CarregarConteudo() {
-    if (!registros.length) {
-      return (
-        <ConteudoVazio>
-          <p>Não há registros de entrada ou saída</p>
-        </ConteudoVazio>
-      );
-    } else {
-      return (
-        <>
-          <Conteudo>
-            {registros.map((registro) => {
-              const { date, evento, value } = registro;
-              return (
-                <WrapperMovimentacao key={date}>
-                  <Separador>
-                    <Data>{dayjs(date).format("DD/MM")}</Data>
-                    <Movimentacao>{evento}</Movimentacao>
-                  </Separador>
-                  <Valor>{parseInt(value)}</Valor>
-                </WrapperMovimentacao>
-              );
-            })}
-          </Conteudo>
-          <Saldo>
-            <SaldoTexto>SALDO</SaldoTexto>
-            <SaldoValor>
-              <CalcularSaldo />
-            </SaldoValor>
-          </Saldo>
-        </>
-      );
-    }
-  }
-
-  function CalcularSaldo() {
-    const saldo = registros.reduce((saldo, registro) => saldo + registro.value, 0)
-    if(saldo >= 0) {
-      return saldo
-    } else {
-      return saldo
-    }
-  }
-
-  function Logout() {
-    localStorage.removeItem('config')
-    navigate("/")
-  }
+  }, [navigate, setRegistros, setNomeUsuario]);
 
   return (
     <Container>
       <Wrapper>
         <Topo>
-          <h1>Olá, Fulano</h1>
+          <h1>Olá, {nomeUsuario}</h1>
           <Link to={"/"}>
             <img src={iconeSair} alt="icone-sair" onClick={Logout}></img>
           </Link>
@@ -111,7 +65,89 @@ export default function Inicio() {
       </Wrapper>
     </Container>
   );
+
+  async function deletar(date) {
+    const config = JSON.parse(localStorage.getItem('config'))
+    const desejoDeletar = window.confirm("Deseja mesmo apagar esse registro?")
+    if(!desejoDeletar) {
+      return
+    }
+    try {
+      await axios.delete(`http://localhost:5000/deletar-registro/${date}`, config)
+      const registrosPromise = await axios.get('http://localhost:5000/buscar-registros', config)
+      setRegistros(registrosPromise.data)
+    } catch(e) {
+      window.alert('Erro ao deletar o registro.')
+    }
+  }
+
+  function CarregarConteudo() {
+    if (!registros.length) {
+      return (
+        <ConteudoVazio>
+          <p>Não há registros de entrada ou saída</p>
+        </ConteudoVazio>
+      );
+    } else {
+      return (
+        <>
+          <Conteudo>
+            {registros.map((registro) => {
+              let { date, evento, value } = registro;
+              return (
+                <WrapperMovimentacao key={date}>
+                  <Separador>
+                    <Data>{dayjs(date).format("DD/MM")}</Data>
+                    <Movimentacao>{evento}</Movimentacao>
+                  </Separador>
+                  <RetornarValor value={value}/>
+                  <Deletar onClick={() => {deletar(date)}}>x</Deletar>
+                </WrapperMovimentacao>
+              );
+            })}
+          </Conteudo>
+          <Saldo>
+            <SaldoTexto>SALDO</SaldoTexto>
+
+              <CalcularSaldo />
+
+          </Saldo>
+        </>
+      );
+    }
+  }
+
+  function RetornarValor(props) {
+    let value = props.value
+    value = parseInt(value)
+    if(value >= 0) {
+      return (
+        <Valor className="verde">{value}</Valor>
+      )
+    }
+    value = value.toString().slice(1, value.length)
+    return <Valor className="vermelho">{parseInt(value)}</Valor>
+  }
+
+  function CalcularSaldo() {
+    const saldo = registros.reduce((saldo, registro) => saldo + registro.value, 0)
+    if(saldo >= 0) {
+      return (
+        <SaldoValor className="verde">{saldo}</SaldoValor>
+      )
+    } else {
+      return (
+        <SaldoValor className="vermelho">{saldo}</SaldoValor>
+      )
+    }
+  }
+
+  function Logout() {
+    localStorage.removeItem('config')
+    navigate("/")
+  }
 }
+
 
 const Container = styled.div`
   background: #8c11be;
@@ -163,7 +199,7 @@ const Conteudo = styled.div`
   background-color: #ffffff;
   height: 450px;
   border-radius: 5px 5px 0 0;
-  padding: 10px 10px 0 10px;
+  padding: 10px 0 0 10px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -172,7 +208,7 @@ const Conteudo = styled.div`
 
 const WrapperMovimentacao = styled.div`
 
-  padding: 15px 15px 0 0;
+  padding: 15px 10px 0 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -181,6 +217,7 @@ const WrapperMovimentacao = styled.div`
 const Separador = styled.div`
   display: flex;
   align-items: center;
+  width: 100%;
 `;
 
 const Data = styled.p`
@@ -195,15 +232,21 @@ const Movimentacao = styled.p`
   font-size: 16px;
   color: #000000;
   display: block;
-  width: 210px;
+  max-width: 180px;
   word-wrap: break-word;
 `;
 
 const Valor = styled.p`
   font-family: "Raleway";
   font-size: 16px;
-  color: #c70000;
 `;
+
+const Deletar = styled.p`
+  font-family: 'Raleway';
+  font-size: 16px;
+  color: #C6C6C6;
+  padding-left: 10px;
+`
 
 const Saldo = styled.div`
   padding-left: 10px;
@@ -225,7 +268,6 @@ const SaldoTexto = styled.p`
 const SaldoValor = styled.p`
   font-family: "Raleway";
   font-size: 17px;
-  color: #03ac00;
 `;
 
 const OpcoesWrapper = styled.div`

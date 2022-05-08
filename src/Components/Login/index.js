@@ -64,7 +64,6 @@ export default function Login() {
           value={usuario.email}
           onChange={(e) => {
             setUsuario({ ...usuario, email: e.target.value });
-            console.log(usuario)
           }}
           type="email"
         ></Input>

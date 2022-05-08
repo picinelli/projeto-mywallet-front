@@ -1,13 +1,13 @@
 import styled from "styled-components";
 import { useState } from "react";
 import axios from "axios";
-import {useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 
 export default function NovaSaida() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [novoRegistro, setNovoRegistro] = useState({
     evento: "",
-    value: 0,
+    value: ""
   });
 
   async function adicionarRegistro(e) {
@@ -22,7 +22,7 @@ export default function NovaSaida() {
       );
       navigate("/inicio");
     } catch (e) {
-      window.alert("Digite um valor negativo ou preencha a descrição");
+      window.alert("Digite um valor positivo ou preencha a descrição");
       console.log(e);
     }
   }
@@ -38,10 +38,10 @@ export default function NovaSaida() {
         >
           <Input
             placeholder="Valor"
-            value={novoRegistro.value}
             onChange={(e) => {
               setNovoRegistro({ ...novoRegistro, value: e.target.value });
             }}
+            value={novoRegistro.value}
             type="number"
           ></Input>
           <Input

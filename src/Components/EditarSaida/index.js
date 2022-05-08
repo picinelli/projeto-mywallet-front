@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react";
 
 import RegistrosContext from "../../Contexts/RegistrosContext.js";
 
-export default function NovaEntrada() {
+export default function EditarSaida() {
   const { setRegistros } = useContext(RegistrosContext);
   const [novoRegistro, setNovoRegistro] = useState({
     evento: "",
@@ -51,7 +51,7 @@ export default function NovaEntrada() {
   return (
     <Container>
       <Wrapper>
-        <Titulo>Nova entrada</Titulo>
+        <Titulo>Editar saída</Titulo>
         <Form
           onSubmit={(e) => {
             adicionarRegistro(e);
@@ -59,24 +59,13 @@ export default function NovaEntrada() {
         >
           <Input
             placeholder="Valor"
-            onChange={(e) => {
-              setNovoRegistro({
-                ...novoRegistro,
-                value: parseInt(e.target.value),
-              });
-            }}
-            value={novoRegistro.value}
             type="number"
           ></Input>
           <Input
             placeholder="Descrição"
-            onChange={(e) => {
-              setNovoRegistro({ ...novoRegistro, evento: e.target.value });
-            }}
-            value={novoRegistro.evento}
             type="text"
           ></Input>
-          <Botao>Salvar entrada</Botao>
+          <Botao>Atualizar saída</Botao>
         </Form>
       </Wrapper>
     </Container>

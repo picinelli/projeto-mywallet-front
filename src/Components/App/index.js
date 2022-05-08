@@ -9,6 +9,8 @@ import Cadastro from '../Cadastro'
 import Inicio from '../Inicio'
 import NovaEntrada from '../NovaEntrada'
 import NovaSaida from '../NovaSaida'
+import EditarEntrada from '../EditarEntrada'
+import EditarSaida from '../EditarSaida'
 
 export default function App() {
   const [token, setToken] = useState({});
@@ -24,6 +26,8 @@ export default function App() {
             <Route path="/inicio" element={<Inicio />}/>
             <Route path="/nova-entrada" element={<NovaEntrada />}/>
             <Route path="/nova-saida" element={<NovaSaida />}/>
+            <Route path="/atualizar-entrada" element={<EditarEntrada />}/>
+            <Route path="/atualizar-saida" element={<EditarSaida />}/>
           </Routes>
         </RegistrosContext.Provider>
       </TokenContext.Provider>
