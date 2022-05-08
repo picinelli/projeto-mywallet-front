@@ -1,49 +1,38 @@
 import styled from "styled-components";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
-
-import RegistrosContext from "../../Contexts/RegistrosContext.js";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 export default function EditarSaida() {
-  const { setRegistros } = useContext(RegistrosContext);
+  const location = useLocation()
+  const {value, date, evento} = location.state
   const [novoRegistro, setNovoRegistro] = useState({
-    evento: "",
-    value: ""
+    value: value,
+    date: date,
+    evento: evento.toString()
   });
   const navigate = useNavigate();
 
   useEffect(() => {
     const config = JSON.parse(localStorage.getItem("config"));
     if (!config) return navigate("/");
+  }, [navigate]);
 
-    async function buscarRegistros() {
-      try {
-        const registrosPromise = await axios.get(
-          "http://localhost:5000/buscar-registros",
-          config
-        );
-        setRegistros(registrosPromise.data);
-      } catch (e) {
-        console.log(e, "erro no buscarRegistros, na pagina Nova-Entrada");
-      }
-    }
-    buscarRegistros();
-  }, [navigate, setRegistros]);
-
-  async function adicionarRegistro(e) {
+  async function alterarRegistro(e) {
     e.preventDefault();
     const config = JSON.parse(localStorage.getItem("config"));
+    if(novoRegistro.value >= 0) {
+      setNovoRegistro({...novoRegistro, value: -novoRegistro.value})
+    }
 
     try {
-      await axios.post(
-        "http://localhost:5000/nova-entrada",
+      await axios.put(
+        "http://localhost:5000/alterar-saida",
         novoRegistro,
         config
       );
       navigate("/inicio");
     } catch (e) {
-      window.alert("Digite um valor positivo ou preencha a descrição");
       console.log(e);
     }
   }
@@ -54,16 +43,30 @@ export default function EditarSaida() {
         <Titulo>Editar saída</Titulo>
         <Form
           onSubmit={(e) => {
-            adicionarRegistro(e);
+            alterarRegistro(e);
           }}
         >
           <Input
             placeholder="Valor"
             type="number"
+            value={novoRegistro.value}
+            onChange={(e) => {
+              setNovoRegistro({
+                ...novoRegistro,
+                value: parseInt(e.target.value),
+              });
+            }}
           ></Input>
           <Input
             placeholder="Descrição"
             type="text"
+            value={novoRegistro.evento}
+            onChange={(e) => {
+              setNovoRegistro({
+                ...novoRegistro,
+                evento: e.target.value,
+              });
+            }}
           ></Input>
           <Botao>Atualizar saída</Botao>
         </Form>

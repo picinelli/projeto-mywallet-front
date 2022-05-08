@@ -98,7 +98,7 @@ export default function Inicio() {
                 <WrapperMovimentacao key={date}>
                   <Separador>
                     <Data>{dayjs(date).format("DD/MM")}</Data>
-                    <Movimentacao>{evento}</Movimentacao>
+                    <Movimentacao onClick={() => {navegarEdicao(value, date, evento)}}>{evento}</Movimentacao>
                   </Separador>
                   <RetornarValor value={value}/>
                   <Deletar onClick={() => {deletar(date)}}>x</Deletar>
@@ -108,13 +108,16 @@ export default function Inicio() {
           </Conteudo>
           <Saldo>
             <SaldoTexto>SALDO</SaldoTexto>
-
               <CalcularSaldo />
-
           </Saldo>
         </>
       );
     }
+  }
+
+  function navegarEdicao(value, date, evento) {
+    if(value >= 0) navigate("/atualizar-entrada", {state: {date, evento, value}})
+    if(value < 0) navigate("/atualizar-saida", {state: {date, evento, value}})
   }
 
   function RetornarValor(props) {
@@ -272,7 +275,7 @@ const SaldoValor = styled.p`
 
 const OpcoesWrapper = styled.div`
   padding-top: 15px;
-  width: 100%;
+
   display: flex;
   justify-content: space-between;
 `;

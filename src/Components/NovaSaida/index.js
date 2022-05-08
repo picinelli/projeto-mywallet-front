@@ -22,7 +22,7 @@ export default function NovaSaida() {
       );
       navigate("/inicio");
     } catch (e) {
-      window.alert("Digite um valor positivo ou preencha a descrição");
+      window.alert("Digite um valor negativo ou preencha a descrição");
       console.log(e);
     }
   }
