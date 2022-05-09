@@ -3,6 +3,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 
+import { ThreeDots } from  'react-loader-spinner'
+
 import RegistrosContext from "../../Contexts/RegistrosContext.js";
 
 export default function NovaEntrada() {
@@ -11,6 +13,7 @@ export default function NovaEntrada() {
     evento: "",
     value: ""
   });
+  const [disabled, setDisabled] = useState(false)
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,7 +23,7 @@ export default function NovaEntrada() {
     async function buscarRegistros() {
       try {
         const registrosPromise = await axios.get(
-          "http://localhost:5000/buscar-registros",
+          "https://projeto-mywallet-back.herokuapp.com/buscar-registros",
           config
         );
         setRegistros(registrosPromise.data);
@@ -33,17 +36,20 @@ export default function NovaEntrada() {
 
   async function adicionarRegistro(e) {
     e.preventDefault();
+    setDisabled(true)
     const config = JSON.parse(localStorage.getItem("config"));
 
     try {
       await axios.post(
-        "http://localhost:5000/nova-entrada",
+        "https://projeto-mywallet-back.herokuapp.com/nova-entrada",
         novoRegistro,
         config
       );
+      setDisabled(false)
       navigate("/inicio");
     } catch (e) {
-      window.alert("Digite um valor positivo ou preencha a descrição");
+      window.alert("Digite um valor ou preencha a descrição");
+      setDisabled(false)
       console.log(e);
     }
   }
@@ -76,11 +82,22 @@ export default function NovaEntrada() {
             value={novoRegistro.evento}
             type="text"
           ></Input>
-          <Botao>Salvar entrada</Botao>
+          <CarregaoBotao />
         </Form>
       </Wrapper>
     </Container>
   );
+
+  function CarregaoBotao() {
+    if (disabled === false) {
+      return (
+        <Botao>Salvar entrada</Botao>
+      )
+    }
+    return (
+      <Botao disabled><ThreeDots color="#FFFFFF" height={80} width={80} /></Botao>
+    )
+  }
 }
 
 const Container = styled.div`
@@ -130,6 +147,9 @@ const Input = styled.input`
 `;
 
 const Botao = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-top: 10px;
   width: 100%;
   max-width: 326px;

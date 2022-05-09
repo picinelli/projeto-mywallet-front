@@ -18,7 +18,7 @@ export default function Cadastro() {
   function cadastrar(e) {
     e.preventDefault();
     setDisabled(true)
-    const promise = axios.post('http://localhost:5000/cadastrar', usuario)
+    const promise = axios.post('https://projeto-mywallet-back.herokuapp.com/cadastrar', usuario)
     promise.then(() => {
       setDisabled(false)
       navigate("/")

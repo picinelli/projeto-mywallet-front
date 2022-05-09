@@ -3,26 +3,32 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+import { ThreeDots } from  'react-loader-spinner'
+
 export default function NovaSaida() {
   const navigate = useNavigate();
   const [novoRegistro, setNovoRegistro] = useState({
     evento: "",
     value: ""
   });
+  const [disabled, setDisabled] = useState(false)
 
   async function adicionarRegistro(e) {
     e.preventDefault();
+    setDisabled(true)
     const config = JSON.parse(localStorage.getItem("config"));
 
     try {
       await axios.post(
-        "http://localhost:5000/nova-saida",
+        "https://projeto-mywallet-back.herokuapp.com/nova-saida",
         novoRegistro,
         config
       );
+      setDisabled(false)
       navigate("/inicio");
     } catch (e) {
-      window.alert("Digite um valor negativo ou preencha a descrição");
+      window.alert("Digite um valor ou preencha a descrição");
+      setDisabled(false)
       console.log(e);
     }
   }
@@ -52,11 +58,22 @@ export default function NovaSaida() {
             }}
             type="text"
           ></Input>
-          <Botao>Salvar saída</Botao>
+          <CarregaoBotao />
         </Form>
       </Wrapper>
     </Container>
   );
+
+  function CarregaoBotao() {
+    if (disabled === false) {
+      return (
+        <Botao>Salvar saída</Botao>
+      )
+    }
+    return (
+      <Botao disabled><ThreeDots color="#FFFFFF" height={80} width={80} /></Botao>
+    )
+  }
 }
 
 const Container = styled.div`
@@ -106,6 +123,9 @@ const Input = styled.input`
 `;
 
 const Botao = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-top: 10px;
   width: 100%;
   max-width: 326px;

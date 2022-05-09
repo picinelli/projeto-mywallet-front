@@ -24,7 +24,7 @@ export default function EditarEntrada() {
 
     try {
       await axios.put(
-        "http://localhost:5000/alterar-registro",
+        "https://projeto-mywallet-back.herokuapp.com/alterar-registro",
         novoRegistro,
         config
       );

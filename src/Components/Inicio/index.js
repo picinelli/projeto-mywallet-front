@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import dayjs from "dayjs";
 import axios from 'axios'
 
+import { ThreeDots } from  'react-loader-spinner'
 import iconeSair from "../../assets/images/icone-sair.svg";
 import iconeMais from "../../assets/images/icone-mais.svg";
 import iconeMenos from "../../assets/images/icone-menos.svg";
@@ -13,19 +14,22 @@ import RegistrosContext from "../../Contexts/RegistrosContext.js";
 export default function Inicio() {
   const { registros, setRegistros } = useContext(RegistrosContext);
   const  [nomeUsuario, setNomeUsuario]  = useState("")
+  const [disabled, setDisabled] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
     const config = JSON.parse(localStorage.getItem('config'))
     if(!config) return navigate("/")
-
+    setDisabled(true)
     async function buscarRegistros() {
       try {
-        const registrosPromise = await axios.get('http://localhost:5000/buscar-registros', config)
-        const buscarNome = await axios.get('http://localhost:5000/buscar-nome', config)
+        const registrosPromise = await axios.get('https://projeto-mywallet-back.herokuapp.com/buscar-registros', config)
+        const buscarNome = await axios.get('https://projeto-mywallet-back.herokuapp.com/buscar-nome', config)
         setRegistros(registrosPromise.data)
         setNomeUsuario(buscarNome.data)
+        setDisabled(false)
       } catch(e) {
+        setDisabled(false)
         console.log(e)
       }
     }
@@ -36,7 +40,7 @@ export default function Inicio() {
     <Container>
       <Wrapper>
         <Topo>
-          <h1>Olá, {nomeUsuario}</h1>
+          <CarregarUsuario />
           <Link to={"/"}>
             <img src={iconeSair} alt="icone-sair" onClick={Logout}></img>
           </Link>
@@ -73,8 +77,8 @@ export default function Inicio() {
       return
     }
     try {
-      await axios.delete(`http://localhost:5000/deletar-registro/${date}`, config)
-      const registrosPromise = await axios.get('http://localhost:5000/buscar-registros', config)
+      await axios.delete(`https://projeto-mywallet-back.herokuapp.com/deletar-registro/${date}`, config)
+      const registrosPromise = await axios.get('https://projeto-mywallet-back.herokuapp.com/buscar-registros', config)
       setRegistros(registrosPromise.data)
     } catch(e) {
       window.alert('Erro ao deletar o registro.')
@@ -88,6 +92,12 @@ export default function Inicio() {
           <p>Não há registros de entrada ou saída</p>
         </ConteudoVazio>
       );
+    } else if (disabled === true) {
+      return (
+        <ConteudoVazio>
+          <ThreeDots color="#000000" height={120} width={120} />
+        </ConteudoVazio>
+      )
     } else {
       return (
         <>
@@ -108,11 +118,22 @@ export default function Inicio() {
           </Conteudo>
           <Saldo>
             <SaldoTexto>SALDO</SaldoTexto>
-              <CalcularSaldo />
+            <CalcularSaldo />
           </Saldo>
         </>
       );
     }
+  }
+
+  function CarregarUsuario() {
+    if (disabled === true) {
+      return (
+        <ThreeDots color="#FFFFFF" height={40} width={40} />
+      )
+    }
+    return (
+      <h1>Olá, {nomeUsuario}</h1>
+    )
   }
 
   function navegarEdicao(value, date, evento) {

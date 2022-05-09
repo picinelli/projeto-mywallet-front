@@ -24,7 +24,7 @@ export default function Login() {
 
     async function buscarRegistros() {
       try {
-        const registrosPromise = await axios.get('http://localhost:5000/buscar-registros', config)
+        const registrosPromise = await axios.get('https://projeto-mywallet-back.herokuapp.com/buscar-registros', config)
         setRegistros(registrosPromise.data)
         navigate("/inicio")
       } catch(e) {
@@ -66,7 +66,7 @@ export default function Login() {
     e.preventDefault();
     setDisabled(true)
     try {
-      const tokenPromise = await axios.post('http://localhost:5000/logar', usuario)
+      const tokenPromise = await axios.post('https://projeto-mywallet-back.herokuapp.com/logar', usuario)
       setToken(tokenPromise.data)
       const config = {
         headers: {
@@ -74,7 +74,7 @@ export default function Login() {
         },
       };
 
-      const registrosPromise = await axios.get('http://localhost:5000/buscar-registros', config)
+      const registrosPromise = await axios.get('https://projeto-mywallet-back.herokuapp.com/buscar-registros', config)
       setRegistros(registrosPromise.data)
 
       const configStorage = JSON.stringify(config)

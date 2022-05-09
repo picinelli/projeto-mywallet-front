@@ -27,7 +27,7 @@ export default function EditarSaida() {
 
     try {
       await axios.put(
-        "http://localhost:5000/alterar-saida",
+        "https://projeto-mywallet-back.herokuapp.com/alterar-saida",
         novoRegistro,
         config
       );
