@@ -3,6 +3,8 @@ import { useState, useContext, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios"
 
+import { ThreeDots } from  'react-loader-spinner'
+
 import TokenContext from '../../Contexts/TokenContext.js'
 import RegistrosContext from "../../Contexts/RegistrosContext.js";
 
@@ -12,6 +14,7 @@ export default function Login() {
     email: "",
     senha: "",
   });
+  const [disabled, setDisabled] = useState(false)
   const { setToken } = useContext(TokenContext)
   const { setRegistros } = useContext(RegistrosContext)
 
@@ -30,30 +33,6 @@ export default function Login() {
     }
     buscarRegistros()
   }, [navigate, setRegistros]);
-
-  async function logar(e) {
-    e.preventDefault();
-
-    try {
-      const tokenPromise = await axios.post('http://localhost:5000/logar', usuario)
-      setToken(tokenPromise.data)
-      const config = {
-        headers: {
-          Authorization: `Bearer ${tokenPromise.data}`,
-        },
-      };
-
-      const registrosPromise = await axios.get('http://localhost:5000/buscar-registros', config)
-      setRegistros(registrosPromise.data)
-
-      const configStorage = JSON.stringify(config)
-      localStorage.setItem("config", configStorage)
-      navigate("/inicio")
-    } catch(e) {
-      window.alert("Usuario ou senha não encontrados")
-      console.log(e)
-    }
-  }
 
   return (
     <Container>
@@ -75,13 +54,51 @@ export default function Login() {
           }}
           type="password"
         ></Input>
-        <Botao>Entrar</Botao>
+        <CarregaoBotao />
       </Form>
       <Link to="/cadastro">
         <Botao className="cadastre">Primeira vez? Cadastre-se!</Botao>
       </Link>
     </Container>
   );
+
+  async function logar(e) {
+    e.preventDefault();
+    setDisabled(true)
+    try {
+      const tokenPromise = await axios.post('http://localhost:5000/logar', usuario)
+      setToken(tokenPromise.data)
+      const config = {
+        headers: {
+          Authorization: `Bearer ${tokenPromise.data}`,
+        },
+      };
+
+      const registrosPromise = await axios.get('http://localhost:5000/buscar-registros', config)
+      setRegistros(registrosPromise.data)
+
+      const configStorage = JSON.stringify(config)
+      localStorage.setItem("config", configStorage)
+      setDisabled(false)
+      navigate("/inicio")
+    } catch(e) {
+      window.alert("Usuario ou senha não encontrados")
+      setDisabled(false)
+      console.log(e)
+    }
+  }
+
+  function CarregaoBotao() {
+    if (disabled === false) {
+      return (
+        <Botao>Entrar</Botao>
+      )
+    }
+    return (
+      <Botao disabled><ThreeDots color="#FFFFFF" height={80} width={80} /></Botao>
+    )
+  }
+
 }
 
 const Container = styled.div`
@@ -136,6 +153,9 @@ const Input = styled.input`
 `;
 
 const Botao = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-top: 10px;
   width: 100%;
   max-width: 326px;

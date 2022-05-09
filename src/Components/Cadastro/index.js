@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom"
 import axios from 'axios'
 
+import { ThreeDots } from  'react-loader-spinner'
+
 export default function Cadastro() {
   const navigate = useNavigate()
   const [usuario, setUsuario] = useState({
@@ -11,25 +13,29 @@ export default function Cadastro() {
     senha: "",
     confirme: "",
   });
+  const [disabled, setDisabled] = useState(false)
 
   function cadastrar(e) {
     e.preventDefault();
-    //mongodb://localhost:27017
+    setDisabled(true)
     const promise = axios.post('http://localhost:5000/cadastrar', usuario)
     promise.then(() => {
-      window.alert("Cadastrado com sucesso!");
+      setDisabled(false)
       navigate("/")
     })
     promise.catch((err) => {
       if (err.response.status === 409) {
         window.alert("Email já está sendo utilizado")
+        setDisabled(false)
       } else if (err.response.status === 400) {
         const errorsDetails = err.response.data.map((object) => {
           return object;
         });
         window.alert(errorsDetails)
+        setDisabled(false)
       } else {
         window.alert("Ops! Alguma coisa deu errado!")
+        setDisabled(false)
         console.log(err)
       }
     })
@@ -71,13 +77,24 @@ export default function Cadastro() {
           }}
           type="password"
         ></Input>
-        <Botao>Cadastrar</Botao>
+        <CarregaoBotao />
       </Form>
       <Link to="/">
         <Botao className="logue">Já tem uma conta? Entre agora!</Botao>
       </Link>
     </Container>
   );
+
+  function CarregaoBotao() {
+    if (disabled === false) {
+      return (
+        <Botao>Cadastrar</Botao>
+      )
+    }
+    return (
+      <Botao disabled><ThreeDots color="#FFFFFF" height={80} width={80} /></Botao>
+    )
+  }
 }
 
 const Container = styled.div`
@@ -132,6 +149,9 @@ const Input = styled.input`
 `;
 
 const Botao = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-top: 10px;
   width: 100%;
   max-width: 326px;
