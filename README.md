@@ -13,14 +13,14 @@
   <p align="center">
     Single-Page Application (SPA) de um Aplicativo de Controle de Gastos.
     <br />
-    <a href="https://github.com/picinelli/Projeto-TrackIt/tree/main/src"><strong>Código JSX»</strong></a>
+    <a href="https://github.com/picinelli/projeto-mywallet-front/tree/main/src"><strong>Código JSX»</strong></a>
 </div>
 
 <!-- ABOUT THE PROJECT -->
 
 ![Banner](https://github.com/picinelli/projeto-mywallet-front/blob/main/src/assets/images/MyWalletBanner.png)
 
-# OBS: Esse é um projeto FULL-STACK, para ver o código do BACK-END, <a href="https://github.com/picinelli/projeto-mywallet-back"><strong>Clique Aqui»</strong></a>
+## OBS: Esse é um projeto FULL-STACK, para ver o código do BACK-END, <a href="https://github.com/picinelli/projeto-mywallet-back"><strong>Clique Aqui»</strong></a>
 
 # Requisitos
 
